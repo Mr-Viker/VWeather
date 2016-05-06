@@ -77,7 +77,7 @@ public class VWeatherDB {
     }
 
     //从数据库读取某省下所有的城市信息
-    public List<City> loadCitys(int provinceId) {
+    public List<City> loadCities(int provinceId) {
         List<City> list = new ArrayList<>();
         Cursor cursor = db.query("City", null, "province_id=?",
                 new String[]{String.valueOf(provinceId)}, null, null, null);
