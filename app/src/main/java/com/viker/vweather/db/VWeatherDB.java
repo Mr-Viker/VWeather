@@ -1,11 +1,13 @@
-package com.viker.vweather.model;
+package com.viker.vweather.db;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.viker.vweather.db.VWeatherOpenHelper;
+import com.viker.vweather.model.City;
+import com.viker.vweather.model.County;
+import com.viker.vweather.model.Province;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,8 +59,7 @@ public class VWeatherDB {
                 province.setProvinceName(cursor.getString
                         (cursor.getColumnIndex("province_name")));
                 province.setProvinceCode(cursor.getString(
-                        cursor.getColumnIndex("province_code")
-                ));
+                        cursor.getColumnIndex("province_code")));
                 list.add(province);
             } while (cursor.moveToNext());
         }

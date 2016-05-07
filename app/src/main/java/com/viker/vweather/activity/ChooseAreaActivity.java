@@ -2,7 +2,10 @@ package com.viker.vweather.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
@@ -12,10 +15,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.viker.vweather.R;
+import com.viker.vweather.db.VWeatherDB;
 import com.viker.vweather.model.City;
 import com.viker.vweather.model.County;
 import com.viker.vweather.model.Province;
-import com.viker.vweather.model.VWeatherDB;
 import com.viker.vweather.util.HttpCallbackListener;
 import com.viker.vweather.util.HttpUtil;
 import com.viker.vweather.util.Utility;
@@ -48,10 +51,22 @@ public class ChooseAreaActivity extends Activity {
     private City selectedCity;
     //当前选中的级别
     private int currentLevel;
+    //是否从WeatherActivity中切换城市过来的。
+    private Boolean isFromWeatherActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        isFromWeatherActivity = getIntent().getBooleanExtra("from_weather_activity", false);
+        //判断以前是否选择过城市，如果是则启动app时自动跳转至WeatherActivity。
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        //已经选择了城市且不是从WeatherActivity中切换城市过来的，才会在启动app时直接跳转至WeatherActivity
+        if (prefs.getBoolean("city_selected", false) && !isFromWeatherActivity) {
+            Intent intent=new Intent(this, WeatherActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
         setContentView(R.layout.choose_area);
         titleText = (TextView) findViewById(R.id.title_text);
         listView = (ListView) findViewById(R.id.list_view);
@@ -68,6 +83,12 @@ public class ChooseAreaActivity extends Activity {
                 } else if (currentLevel == LEVEL_CITY) {
                     selectedCity = cityList.get(position);
                     queryCounties();
+                } else if (currentLevel == LEVEL_COUNTY) {
+                    String countyCode = countyList.get(position).getCountyCode();
+                    Intent intent = new Intent(ChooseAreaActivity.this, WeatherActivity.class);
+                    intent.putExtra("county_code",countyCode);
+                    startActivity(intent);
+                    finish();
                 }
             }
         });
@@ -129,7 +150,7 @@ public class ChooseAreaActivity extends Activity {
     private void queryFromServer(final String code, final String type) {
         String address;
         if (!TextUtils.isEmpty(code)) {
-            address = "http://www.weather.com.cn/data/list3/city"+code+".xml";
+            address = "http://www.weather.com.cn/data/list3/city" + code + ".xml";
         } else {
             address = "http://www.weather.com.cn/data/list3/city.xml";
         }
@@ -206,6 +227,10 @@ public class ChooseAreaActivity extends Activity {
         } else if (currentLevel == LEVEL_CITY) {
             queryProvinces();
         } else {
+            if (isFromWeatherActivity) {
+                Intent intent = new Intent(ChooseAreaActivity.this, WeatherActivity.class);
+                startActivity(intent);
+            }
             finish();
         }
     }
