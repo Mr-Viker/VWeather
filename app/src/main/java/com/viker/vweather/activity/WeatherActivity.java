@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.viker.vweather.R;
+import com.viker.vweather.service.AutoUpdateService;
 import com.viker.vweather.util.HttpCallbackListener;
 import com.viker.vweather.util.HttpUtil;
 import com.viker.vweather.util.Utility;
@@ -132,6 +133,9 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
         currentDateText.setText(prefs.getString("current_date", ""));
         weatherInfoLayout.setVisibility(View.VISIBLE);
         cityNameText.setVisibility(View.VISIBLE);
+        //第一次需要激活AutoUpdateService
+        Intent intent = new Intent(this, AutoUpdateService.class);
+        startService(intent);
     }
 
     @Override
